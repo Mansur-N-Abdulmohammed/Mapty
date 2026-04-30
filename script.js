@@ -1,30 +1,19 @@
 'use strict';
-// let map;
-// let zooom;
-// let marker;
 
-// function initMap() {
-//   map = new google.maps.Map(document.getElementById('map'), {
-//     center: { lat: lat, lng: lng },
-//     zoom: zooom,
-//   });
-
-//   map.addListener('click', function (event) {
-//     const clickedLocation = event.latLng;
-
-//     if (marker) {
-//       marker.setPosition(clickedLocation);
-//     } else {
-//       marker = new google.maps.Marker({
-//         position: clickedLocation,
-//         map: map,
-//       });
-//     }
-//   });
-// }
-
-// prettier-ignore
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
@@ -123,7 +112,7 @@ const insertWorkout = function () {
         </div>
         <div class="workout__details">
           <span class="workout__icon">⚡️</span>
-          <span class="workout__value">${+inputDistance.value / 3.6}</span>
+          <span class="workout__value">${+inputDistance.value}</span>
           <span class="workout__unit">km/h</span>
         </div>
         <div class="workout__details">
