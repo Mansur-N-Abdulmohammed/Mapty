@@ -1,21 +1,5 @@
 'use strict';
 
-const months = [
-  // prettier-ignore
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
 
@@ -27,6 +11,7 @@ const inputElevation = document.querySelector('.form__input--elevation');
 
 class Workout {
   id = (Date.now() + '').slice(-10);
+  _click = 0;
 
   constructor(coords, distance, duration) {
     this.coords = coords;
@@ -34,8 +19,27 @@ class Workout {
     this.duration = duration;
   }
   _Description() {
+    const months = [
+      // prettier-ignore
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
     const date = new Date();
     this.description = `${this.type[0].toUpperCase() + this.type.slice(1)} on ${months[date.getMonth()]} ${[date.getDate()]}`;
+  }
+
+  click() {
+    this._click += 1;
   }
 }
 
@@ -75,8 +79,11 @@ class App {
   #workouts = [];
   constructor() {
     this._getPOsition();
+
+    this._getLocalStorage();
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField.bind(this));
+    containerWorkouts.addEventListener('click', this._movetoPop.bind(this));
   }
 
   _getPOsition() {
@@ -99,6 +106,7 @@ class App {
     }).addTo(this.#map);
 
     this.#map.on('click', this._showForm.bind(this));
+    this.#workouts.forEach(e => this._renderWorkoutMarker(e));
   }
 
   _showForm(target) {
@@ -155,11 +163,11 @@ class App {
 
       workout = new Cycling([lat, lng], distance, duration, elevation);
     }
-    console.log(workout);
     this.#workouts.push(workout);
     this._renderWorkout(workout);
     this._renderWorkoutMarker(workout);
     this._hideForm();
+    this._setLocalStorage();
   }
   _renderWorkout(workout) {
     let html = `
@@ -223,6 +231,39 @@ class App {
         `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`,
       )
       .openPopup();
+  }
+
+  _movetoPop(e) {
+    e.preventDefault();
+    const t = e.target.closest('.workout');
+    if (!t) return;
+    const id = t.dataset.id;
+    const work = this.#workouts.find(obj => obj.id === id);
+    this.#map.setView(work.coords, this.#mapZoom, {
+      animate: true,
+      pan: {
+        duration: 1.5,
+      },
+    });
+    // work.click();
+  }
+
+  _setLocalStorage() {
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+  _getLocalStorage() {
+    const data = localStorage.getItem('workouts');
+    if (!data) return;
+
+    this.#workouts = JSON.parse(data);
+    this.#workouts.forEach(e => {
+      this._renderWorkout(e);
+    });
+  }
+
+  reset() {
+    localStorage.removeItem('workouts');
+    location.reload();
   }
 }
 
